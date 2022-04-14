@@ -13,35 +13,22 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
+    <DataGrid TItem="WeatherForecast" Data="forecasts" FixedHeader=true>
+        <DataGridColumns>
+            <DataGridDateColumn Field="@(nameof(WeatherForecast.Date))" Caption="Date"></DataGridDateColumn>
+            <DataGridColumn Field="@(nameof(WeatherForecast.TemperatureC))" Caption="Temp"></DataGridColumn>
+            <DataGridColumn Field="@(nameof(WeatherForecast.Summary))" Caption="Summary"></DataGridColumn>
+        </DataGridColumns>
+    </DataGrid>
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private List<WeatherForecast>? forecasts = new List<WeatherForecast>();
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        forecasts = await Http.GetFromJsonAsync<List<WeatherForecast>>("sample-data/weather.json");
     }
 
     public class WeatherForecast
@@ -54,6 +41,6 @@ else
 
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
-        public List<WeatherForecast> SubRows{ get; set; }
+        public List<WeatherForecast> SubRows { get; set; }
     }
 }

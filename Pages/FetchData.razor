@@ -20,6 +20,16 @@ else
             <DataGridColumn Field="@(nameof(WeatherForecast.TemperatureC))" Caption="Temp"></DataGridColumn>
             <DataGridColumn Field="@(nameof(WeatherForecast.Summary))" Caption="Summary"></DataGridColumn>
         </DataGridColumns>
+        <DetailRowTemplate>
+            @{ 
+                var subrows = context.SubRows;
+                <DataGrid TItem="WeatherForecast" Data="subrows" Responsive>
+                    <DataGridColumns>
+                        <DataGridColumn Field="@nameof(WeatherForecast.Summary)" Caption="subs"/>
+                    </DataGridColumns>
+                </DataGrid>
+            }
+        </DetailRowTemplate>
     </DataGrid>
 }
 

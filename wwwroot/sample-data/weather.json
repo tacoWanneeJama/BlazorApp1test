@@ -1,27 +1,32 @@
 ﻿[
   {
+    "id":  1,
     "date": "2018-05-06",
     "temperatureC": 1,
     "summary": "Freezing",
-    "SubRows": [ {"summary":  "sr1"} ]
+    "SubRows": [ { "summary": "sr1" } ]
   },
   {
+    "id": 2,
     "date": "2018-05-07",
     "temperatureC": 14,
     "summary": "Bracing"
   },
   {
+    "id": 3,
     "date": "2018-05-08",
     "temperatureC": -13,
     "summary": "Freezing",
     "SubRows": [ { "summary": "sr2" } ]
   },
   {
+    "id": 4,
     "date": "2018-05-09",
     "temperatureC": -16,
     "summary": "Balmy"
   },
   {
+    "id": 4,
     "date": "2018-05-10",
     "temperatureC": -2,
     "summary": "Chilly"

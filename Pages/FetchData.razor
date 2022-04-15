@@ -13,21 +13,53 @@
 }
 else
 {
+    <Check TValue="bool" Checked="_filtered" CheckedChanged="OnFilterSwitch">Filter on</Check>
 
-    <DataGrid TItem="WeatherForecast" Data="forecasts" FixedHeader=true>
+    <DataGrid TItem="WeatherForecast"
+          Data="forecasts"
+          FixedHeader=true
+          CustomFilter="OnCustomFilter" ,
+          DetailRowTrigger="OnDetailRowTrigger">
         <DataGridColumns>
-            <DataGridDateColumn Field="@(nameof(WeatherForecast.Date))" Caption="Date"></DataGridDateColumn>
-            <DataGridColumn Field="@(nameof(WeatherForecast.TemperatureC))" Caption="Temp"></DataGridColumn>
-            <DataGridColumn Field="@(nameof(WeatherForecast.Summary))" Caption="Summary"></DataGridColumn>
-        </DataGridColumns>
-        <DetailRowTemplate>
-            @{ 
-                var subrows = context.SubRows;
-                <DataGrid TItem="WeatherForecast" Data="subrows" Responsive>
-                    <DataGridColumns>
-                        <DataGridColumn Field="@nameof(WeatherForecast.Summary)" Caption="subs"/>
-                    </DataGridColumns>
-                </DataGrid>
+            <DataGridSelectColumn Field="@nameof(WeatherForecast.Id)"
+                              Filterable="false"
+                              Sortable=false
+                              Width="50px">
+                <DisplayTemplate>
+                    @if (context.SubRows != null && context.SubRows.Count() > 0)
+                    {
+                    @if (RowIsExpanded(context.Id))
+                        {
+                        <Button @onclick="@((e)=> OnCloseDetailRowClick(context.Id))">
+                            <i class="fas fa-caret-down" />
+                        </Button>
+                        }
+                        else
+                        {
+                        <Button @onclick="@((e) => OnOpenDetailRowClick(context.Id))">
+                            <i class="fas fa-caret-right" />
+                        </Button>
+                        }
+                    }
+            </DisplayTemplate>
+        </DataGridSelectColumn>
+
+
+        <DataGridDateColumn Field="@(nameof(WeatherForecast.Date))" Caption="Date"></DataGridDateColumn>
+        <DataGridColumn Field="@(nameof(WeatherForecast.TemperatureC))" Caption="Temp"></DataGridColumn>
+        <DataGridColumn Field="@(nameof(WeatherForecast.Summary))" Caption="Summary"></DataGridColumn>
+    </DataGridColumns>
+    <DetailRowTemplate>
+        @{
+                if (context.SubRows != null && context.SubRows.Count > 0)
+                {
+                    var subrows = context.SubRows;
+                    <DataGrid TItem="WeatherForecast" Data="subrows" Responsive>
+                        <DataGridColumns>
+                            <DataGridColumn Field="@nameof(WeatherForecast.Summary)" Caption="subs" />
+                        </DataGridColumns>
+                    </DataGrid>
+                }
             }
         </DetailRowTemplate>
     </DataGrid>
@@ -35,22 +67,58 @@ else
 
 @code {
     private List<WeatherForecast>? forecasts = new List<WeatherForecast>();
+    private List<int> _openRows = new();
+    private bool _filtered = false;
+
 
     protected override async Task OnInitializedAsync()
     {
         forecasts = await Http.GetFromJsonAsync<List<WeatherForecast>>("sample-data/weather.json");
     }
 
+    private void OnFilterSwitch(bool enabled)
+    {
+        _filtered = enabled;
+    }
+
+    private bool OnDetailRowTrigger(DetailRowTriggerEventArgs<WeatherForecast> context)
+    {
+        bool result = RowIsExpanded(context.Item.Id);
+        return result;
+    }
+
+    private bool OnCustomFilter(WeatherForecast row)
+    {
+        if (_filtered && row.Id < 5) return false;
+        return true;
+    }
+
+    private bool RowIsExpanded(int tag)
+    {
+        return _openRows.Find(ob => ob == tag) != 0;
+    }
+
+    private void OnOpenDetailRowClick(int id)
+    {
+        _openRows.Add(id);
+    }
+
+    private void OnCloseDetailRowClick(int id)
+    {
+        var foundTagtag = _openRows.Find(ob => ob == id);
+        if (foundTagtag != null)
+        {
+            _openRows.Remove(foundTagtag);
+        }
+    }
+
     public class WeatherForecast
     {
+        public int Id { get; set; }
         public DateTime Date { get; set; }
-
         public int TemperatureC { get; set; }
-
         public string? Summary { get; set; }
-
         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-
         public List<WeatherForecast> SubRows { get; set; }
     }
 }

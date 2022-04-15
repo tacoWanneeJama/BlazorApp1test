@@ -1,4 +1,5 @@
 ﻿@page "/fetchdata"
+@page "/"
 @inject HttpClient Http
 
 <PageTitle>Weather forecast</PageTitle>
@@ -17,9 +18,14 @@ else
 
     <DataGrid TItem="WeatherForecast"
           Data="forecasts"
-          FixedHeader=true
-          CustomFilter="OnCustomFilter" ,
-          DetailRowTrigger="OnDetailRowTrigger">
+          FixedHeader
+          FixedHeaderDataGridMaxHeight="1200px"
+          FixedHeaderDataGridHeight="1200px"
+          CustomFilter="OnCustomFilter"
+          DetailRowTrigger="OnDetailRowTrigger"
+          DetailRowStartsVisible=true
+          Sortable=true
+          Responsive>
         <DataGridColumns>
             <DataGridSelectColumn Field="@nameof(WeatherForecast.Id)"
                               Filterable="false"
@@ -54,7 +60,13 @@ else
                 if (context.SubRows != null && context.SubRows.Count > 0)
                 {
                     var subrows = context.SubRows;
-                    <DataGrid TItem="WeatherForecast" Data="subrows" Responsive>
+                    <DataGrid TItem="WeatherForecast"
+                  Data="subrows"
+                      Responsive
+                  Sortable=false
+                  Filterable=false
+                  RowClicked="OnSubRowClicked"   
+                  Context="datailContext">
                         <DataGridColumns>
                             <DataGridColumn Field="@nameof(WeatherForecast.Summary)" Caption="subs" />
                         </DataGridColumns>
@@ -87,9 +99,15 @@ else
         return result;
     }
 
+    private async Task OnSubRowClicked(DataGridRowMouseEventArgs<WeatherForecast> arg)
+    {
+        var id = arg.Item.Id;
+
+    }
+
     private bool OnCustomFilter(WeatherForecast row)
     {
-        if (_filtered && row.Id < 5) return false;
+        if (_filtered && row.Id < 4) return false;
         return true;
     }
 

@@ -95,6 +95,7 @@ else
 
     private bool OnDetailRowTrigger(DetailRowTriggerEventArgs<WeatherForecast> context)
     {
+        context.Toggleable = false;
         bool result = RowIsExpanded(context.Item.Id);
         return result;
     }
